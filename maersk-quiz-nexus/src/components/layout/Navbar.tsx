@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -19,12 +19,15 @@ import {
   BookOpen,
   Shield,
   Anchor,
+  Menu,
+  X as Close,
 } from "lucide-react";
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, profile, signOut } = useAuth();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleLogout = async () => {
     await signOut();
@@ -37,9 +40,9 @@ const Navbar = () => {
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className="glass-card sticky top-0 z-50 mx-4 mt-4 mb-8"
+      className="glass-card sticky top-0 z-50 mx-2 sm:mx-4 mt-4 mb-6 sm:mb-8"
     >
-      <div className="flex items-center justify-between px-6 py-4">
+      <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4">
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-3 group">
           <motion.div
@@ -49,17 +52,17 @@ const Navbar = () => {
           >
             <Anchor className="h-6 w-6 text-white" />
           </motion.div>
-          <div>
-            <h1 className="font-heading text-xl font-bold gradient-text">
+          <div className="hidden xs:block">
+            <h1 className="font-heading text-lg sm:text-xl font-bold gradient-text leading-tight">
               OminbaseQuiz App
             </h1>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-[10px] sm:text-xs text-muted-foreground">
               Intelligent Quiz Platform
             </p>
           </div>
         </Link>
 
-        {/* Navigation Links */}
+        {/* Desktop Navigation */}
         {user && profile && (
           <div className="hidden md:flex items-center space-x-1">
             <Button
@@ -72,7 +75,6 @@ const Navbar = () => {
                 <span>Quizzes</span>
               </Link>
             </Button>
-
             <Button
               variant={isActive("/analytics") ? "default" : "ghost"}
               asChild
@@ -83,7 +85,6 @@ const Navbar = () => {
                 <span>Analytics</span>
               </Link>
             </Button>
-
             {profile.role === "admin" && (
               <Button
                 variant={isActive("/admin") ? "default" : "ghost"}
@@ -99,8 +100,24 @@ const Navbar = () => {
           </div>
         )}
 
-        {/* User Menu or Auth Buttons */}
-        <div className="flex items-center space-x-4">
+        {/* Right Section */}
+        <div className="flex items-center space-x-2 sm:space-x-4">
+          {/* Mobile menu button */}
+          {user && profile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden rounded-xl"
+              onClick={() => setMobileOpen((o) => !o)}
+              aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
+            >
+              {mobileOpen ? (
+                <Close className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
+            </Button>
+          )}
           {user && profile ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -171,6 +188,53 @@ const Navbar = () => {
           )}
         </div>
       </div>
+
+      {/* Mobile Nav Panel */}
+      {user && profile && (
+        <div
+          className={`md:hidden px-4 pb-4 transition-all duration-300 overflow-hidden ${
+            mobileOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="flex flex-col space-y-2 bg-background/60 rounded-xl p-4 border border-border backdrop-blur">
+            <Button
+              variant={isActive("/dashboard") ? "default" : "outline"}
+              asChild
+              className="justify-start rounded-lg"
+              onClick={() => setMobileOpen(false)}
+            >
+              <Link to="/dashboard" className="flex items-center space-x-2">
+                <BookOpen className="h-4 w-4" />
+                <span>Quizzes</span>
+              </Link>
+            </Button>
+            <Button
+              variant={isActive("/analytics") ? "default" : "outline"}
+              asChild
+              className="justify-start rounded-lg"
+              onClick={() => setMobileOpen(false)}
+            >
+              <Link to="/analytics" className="flex items-center space-x-2">
+                <BarChart3 className="h-4 w-4" />
+                <span>Analytics</span>
+              </Link>
+            </Button>
+            {profile.role === "admin" && (
+              <Button
+                variant={isActive("/admin") ? "default" : "outline"}
+                asChild
+                className="justify-start rounded-lg"
+                onClick={() => setMobileOpen(false)}
+              >
+                <Link to="/admin" className="flex items-center space-x-2">
+                  <Shield className="h-4 w-4" />
+                  <span>Admin</span>
+                </Link>
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
     </motion.nav>
   );
 };
