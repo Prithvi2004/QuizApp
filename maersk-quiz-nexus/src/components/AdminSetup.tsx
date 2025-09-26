@@ -47,7 +47,7 @@ const AdminSetup = () => {
       toast({
         title: "Admin User Created",
         description:
-          "Admin user (admin@maersk.com / admin123) has been created",
+          "Admin user (admin@gmail.com / admin123) has been created",
       });
     } catch (error) {
       toast({
@@ -128,8 +128,7 @@ const AdminSetup = () => {
 
           {adminCreated && (
             <p className="text-sm text-green-600">
-              Admin user created! You can now sign in with admin@maersk.com /
-              admin123
+              Admin user created!
             </p>
           )}
 

@@ -103,13 +103,13 @@ const Auth = () => {
   const demoAccounts = [
     {
       type: "Admin",
-      email: "admin@maersk.com",
+      email: "admin@gmail.com",
       password: "admin123",
       role: "admin" as const,
     },
     {
       type: "User",
-      email: "user@maersk.com",
+      email: "user@gmail.com",
       password: "user123",
       role: "user" as const,
     },

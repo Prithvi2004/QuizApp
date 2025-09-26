@@ -4,7 +4,7 @@ export const createAdminUser = async () => {
   try {
     // First, sign up the admin user
     const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: "admin@maersk.com",
+      email: "admin@gmail.com",
       password: "admin123",
       options: {
         data: {
@@ -23,7 +23,7 @@ export const createAdminUser = async () => {
       // Create admin profile
       const { error: profileError } = await supabase.from("profiles").insert({
         user_id: authData.user.id,
-        email: "admin@maersk.com",
+        email: "admin@gmail.com",
         name: "Admin User",
         role: "admin",
       });
