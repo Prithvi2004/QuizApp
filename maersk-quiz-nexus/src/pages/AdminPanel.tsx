@@ -39,6 +39,7 @@ import {
   Clock,
   Target,
 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 const AdminPanel = () => {
   const {
@@ -52,6 +53,32 @@ const AdminPanel = () => {
   const { toast } = useToast();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
+  const [editingQuizData, setEditingQuizData] = useState<{
+    title: string;
+    description: string;
+    difficulty: "Easy" | "Medium" | "Hard";
+    category: string;
+    timeLimit: number; // seconds
+    isPublished: boolean;
+    questions: Question[]; // keep ids
+  } | null>(null);
+
+  // When a quiz is selected for editing, populate local editable state
+  useEffect(() => {
+    if (editingQuiz) {
+      setEditingQuizData({
+        title: editingQuiz.title,
+        description: editingQuiz.description,
+        difficulty: editingQuiz.difficulty,
+        category: editingQuiz.category,
+        timeLimit: editingQuiz.time_limit,
+        isPublished: editingQuiz.is_published,
+        questions: editingQuiz.questions.map((q) => ({ ...q })),
+      });
+    } else {
+      setEditingQuizData(null);
+    }
+  }, [editingQuiz]);
   const [newQuiz, setNewQuiz] = useState({
     title: "",
     description: "",
@@ -156,6 +183,126 @@ const AdminPanel = () => {
       title: "Question Added",
       description: "Question has been added to the quiz",
     });
+  };
+
+  // Editing helpers
+  const addEditingQuestion = () => {
+    if (!editingQuizData) return;
+    setEditingQuizData((prev) =>
+      prev
+        ? {
+            ...prev,
+            questions: [
+              ...prev.questions,
+              {
+                id: (Date.now() + prev.questions.length).toString(),
+                question: "",
+                options: ["", "", "", ""],
+                correctAnswer: 0,
+              },
+            ],
+          }
+        : prev
+    );
+  };
+
+  const updateEditingQuestionField = (
+    index: number,
+    field: keyof Question,
+    value: any
+  ) => {
+    setEditingQuizData((prev) => {
+      if (!prev) return prev;
+      const questions = [...prev.questions];
+      const target = { ...questions[index] };
+      (target as any)[field] = value;
+      questions[index] = target;
+      return { ...prev, questions };
+    });
+  };
+
+  const updateEditingOption = (
+    qIndex: number,
+    optIndex: number,
+    value: string
+  ) => {
+    setEditingQuizData((prev) => {
+      if (!prev) return prev;
+      const questions = [...prev.questions];
+      const target = { ...questions[qIndex] };
+      const opts = [...target.options];
+      opts[optIndex] = value;
+      target.options = opts;
+      questions[qIndex] = target;
+      return { ...prev, questions };
+    });
+  };
+
+  const removeEditingQuestion = (index: number) => {
+    setEditingQuizData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        questions: prev.questions.filter((_, i) => i !== index),
+      };
+    });
+  };
+
+  const handleUpdateQuiz = async () => {
+    if (!editingQuiz || !editingQuizData) return;
+    if (
+      !editingQuizData.title ||
+      !editingQuizData.description ||
+      !editingQuizData.category
+    ) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (editingQuizData.questions.length === 0) {
+      toast({
+        title: "No Questions",
+        description: "Add at least one question",
+        variant: "destructive",
+      });
+      return;
+    }
+    // Basic validation for each question
+    for (const q of editingQuizData.questions) {
+      if (!q.question.trim() || q.options.some((o) => !o.trim())) {
+        toast({
+          title: "Incomplete Question",
+          description: "All questions and options must be filled",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+    try {
+      await updateQuiz(editingQuiz.id, {
+        title: editingQuizData.title,
+        description: editingQuizData.description,
+        difficulty: editingQuizData.difficulty,
+        category: editingQuizData.category,
+        time_limit: editingQuizData.timeLimit,
+        is_published: editingQuizData.isPublished,
+        questions: editingQuizData.questions as any,
+      });
+      toast({
+        title: "Quiz Updated",
+        description: `${editingQuizData.title} saved successfully`,
+      });
+      setEditingQuiz(null);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update quiz",
+        variant: "destructive",
+      });
+    }
   };
 
   const removeQuestion = (index: number) => {
@@ -734,6 +881,230 @@ const AdminPanel = () => {
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* Edit Quiz Dialog */}
+        <Dialog
+          open={!!editingQuiz}
+          onOpenChange={(open) => !open && setEditingQuiz(null)}
+        >
+          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto glass">
+            <DialogHeader>
+              <DialogTitle className="font-heading text-2xl gradient-text">
+                Edit Quiz
+              </DialogTitle>
+              <DialogDescription>
+                Update quiz details, questions and publishing status
+              </DialogDescription>
+            </DialogHeader>
+            {editingQuizData && (
+              <div className="space-y-6 py-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="editTitle">Quiz Title</Label>
+                    <Input
+                      id="editTitle"
+                      value={editingQuizData.title}
+                      onChange={(e) =>
+                        setEditingQuizData((prev) =>
+                          prev ? { ...prev, title: e.target.value } : prev
+                        )
+                      }
+                      className="glass"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="editCategory">Category</Label>
+                    <Input
+                      id="editCategory"
+                      value={editingQuizData.category}
+                      onChange={(e) =>
+                        setEditingQuizData((prev) =>
+                          prev ? { ...prev, category: e.target.value } : prev
+                        )
+                      }
+                      className="glass"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="editDesc">Description</Label>
+                  <Textarea
+                    id="editDesc"
+                    value={editingQuizData.description}
+                    onChange={(e) =>
+                      setEditingQuizData((prev) =>
+                        prev ? { ...prev, description: e.target.value } : prev
+                      )
+                    }
+                    className="glass"
+                  />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                  <div>
+                    <Label>Difficulty</Label>
+                    <Select
+                      value={editingQuizData.difficulty}
+                      onValueChange={(val: "Easy" | "Medium" | "Hard") =>
+                        setEditingQuizData((prev) =>
+                          prev ? { ...prev, difficulty: val } : prev
+                        )
+                      }
+                    >
+                      <SelectTrigger className="glass">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Easy">Easy</SelectItem>
+                        <SelectItem value="Medium">Medium</SelectItem>
+                        <SelectItem value="Hard">Hard</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Time Limit (minutes)</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={120}
+                      value={Math.round(editingQuizData.timeLimit / 60)}
+                      onChange={(e) =>
+                        setEditingQuizData((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                timeLimit: parseInt(e.target.value) * 60,
+                              }
+                            : prev
+                        )
+                      }
+                      className="glass"
+                    />
+                  </div>
+                  <div className="flex items-center space-x-3 pt-6">
+                    <Switch
+                      checked={editingQuizData.isPublished}
+                      onCheckedChange={(c) =>
+                        setEditingQuizData((prev) =>
+                          prev ? { ...prev, isPublished: !!c } : prev
+                        )
+                      }
+                    />
+                    <span className="text-sm">
+                      {editingQuizData.isPublished ? "Published" : "Draft"}
+                    </span>
+                  </div>
+                </div>
+                <div className="border-t pt-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-heading text-xl font-bold">
+                      Questions ({editingQuizData.questions.length})
+                    </h3>
+                    <Button
+                      onClick={addEditingQuestion}
+                      className="btn-hero"
+                      size="sm"
+                    >
+                      <Plus className="h-4 w-4 mr-1" /> Add Question
+                    </Button>
+                  </div>
+                  <div className="space-y-4">
+                    {editingQuizData.questions.map((q, qIdx) => (
+                      <Card key={q.id || qIdx} className="glass-card">
+                        <CardContent className="p-4 space-y-4">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1 mr-4">
+                              <Label className="text-sm mb-1 block">
+                                Question {qIdx + 1}
+                              </Label>
+                              <Textarea
+                                value={q.question}
+                                onChange={(e) =>
+                                  updateEditingQuestionField(
+                                    qIdx,
+                                    "question",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="Enter question"
+                                className="glass"
+                              />
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeEditingQuestion(qIdx)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-sm">
+                              Options (select correct)
+                            </Label>
+                            {q.options.map((opt, optIdx) => (
+                              <div
+                                key={optIdx}
+                                className="flex items-center space-x-2"
+                              >
+                                <input
+                                  type="radio"
+                                  name={`correct-${q.id}`}
+                                  checked={q.correctAnswer === optIdx}
+                                  onChange={() =>
+                                    updateEditingQuestionField(
+                                      qIdx,
+                                      "correctAnswer",
+                                      optIdx
+                                    )
+                                  }
+                                />
+                                <Label className="text-sm w-5">
+                                  {String.fromCharCode(65 + optIdx)}
+                                </Label>
+                                <Input
+                                  value={opt}
+                                  onChange={(e) =>
+                                    updateEditingOption(
+                                      qIdx,
+                                      optIdx,
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder={`Option ${String.fromCharCode(
+                                    65 + optIdx
+                                  )}`}
+                                  className="glass"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                    {editingQuizData.questions.length === 0 && (
+                      <p className="text-sm text-muted-foreground">
+                        No questions yet. Add one to get started.
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex justify-end space-x-4 border-t pt-6">
+                  <Button
+                    variant="outline"
+                    onClick={() => setEditingQuiz(null)}
+                    className="btn-glass"
+                  >
+                    Cancel
+                  </Button>
+                  <Button onClick={handleUpdateQuiz} className="btn-hero">
+                    <Save className="h-4 w-4 mr-2" /> Save Changes
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
