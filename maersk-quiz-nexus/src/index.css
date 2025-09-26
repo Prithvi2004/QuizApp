@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Maersk Quiz Pro Design System - Futuristic SaaS meets Enterprise Branding */
+/* OminbaseQuiz App Design System - Adaptive Real-time Assessment Platform */
 
 @layer base {
   :root {
@@ -19,54 +19,71 @@
     /* Core Theme Variables */
     --background: 200 83% 98%;
     --foreground: var(--maersk-navy);
-    
+
     --card: 0 0% 100%;
     --card-foreground: var(--maersk-navy);
-    
+
     --popover: 0 0% 100%;
     --popover-foreground: var(--maersk-navy);
-    
+
     --primary: var(--maersk-navy);
     --primary-foreground: 0 0% 100%;
-    
+
     --secondary: var(--maersk-light-blue);
     --secondary-foreground: var(--maersk-navy);
-    
+
     --muted: var(--maersk-off-white);
     --muted-foreground: var(--maersk-gray);
-    
+
     --accent: var(--maersk-blue);
     --accent-foreground: 0 0% 100%;
-    
+
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    
+
     --border: var(--maersk-light-gray);
     --input: var(--maersk-light-gray);
     --ring: var(--maersk-blue);
-    
+
     --radius: 12px;
-    
+
     /* Glass Morphism Effects */
     --glass-bg: hsla(200, 83%, 98%, 0.8);
     --glass-border: hsla(200, 100%, 19%, 0.1);
     --glass-shadow: 0 8px 32px hsla(200, 100%, 19%, 0.1);
-    
+
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--maersk-navy)), hsl(var(--maersk-blue)));
-    --gradient-secondary: linear-gradient(135deg, hsl(var(--maersk-blue)), hsl(var(--maersk-light-blue)));
-    --gradient-accent: linear-gradient(135deg, hsl(var(--maersk-light-blue)), hsl(var(--maersk-ice)));
-    --gradient-cosmic: linear-gradient(135deg, hsl(var(--maersk-navy)) 0%, hsl(var(--maersk-blue)) 50%, hsl(var(--maersk-light-blue)) 100%);
-    
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(var(--maersk-navy)),
+      hsl(var(--maersk-blue))
+    );
+    --gradient-secondary: linear-gradient(
+      135deg,
+      hsl(var(--maersk-blue)),
+      hsl(var(--maersk-light-blue))
+    );
+    --gradient-accent: linear-gradient(
+      135deg,
+      hsl(var(--maersk-light-blue)),
+      hsl(var(--maersk-ice))
+    );
+    --gradient-cosmic: linear-gradient(
+      135deg,
+      hsl(var(--maersk-navy)) 0%,
+      hsl(var(--maersk-blue)) 50%,
+      hsl(var(--maersk-light-blue)) 100%
+    );
+
     /* Animation Variables */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-spring: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     --glow-primary: 0 0 20px hsla(var(--maersk-blue), 0.3);
     --glow-secondary: 0 0 15px hsla(var(--maersk-light-blue), 0.4);
-    
+
     /* Font Variables */
-    --font-heading: 'Bai Jamjuree', sans-serif;
-    --font-body: 'Space Grotesk', sans-serif;
+    --font-heading: "Bai Jamjuree", sans-serif;
+    --font-body: "Space Grotesk", sans-serif;
 
     --sidebar-background: 0 0% 98%;
 
@@ -88,37 +105,37 @@
   .dark {
     --background: var(--maersk-navy);
     --foreground: 0 0% 100%;
-    
+
     --card: var(--maersk-dark-gray);
     --card-foreground: 0 0% 100%;
-    
+
     --popover: var(--maersk-dark-gray);
     --popover-foreground: 0 0% 100%;
-    
+
     --primary: var(--maersk-blue);
     --primary-foreground: 0 0% 100%;
-    
+
     --secondary: var(--maersk-dark-gray);
     --secondary-foreground: 0 0% 100%;
-    
+
     --muted: var(--maersk-gray);
     --muted-foreground: var(--maersk-light-gray);
-    
+
     --accent: var(--maersk-light-blue);
     --accent-foreground: var(--maersk-navy);
-    
+
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    
+
     --border: var(--maersk-gray);
     --input: var(--maersk-gray);
     --ring: var(--maersk-light-blue);
-    
+
     /* Dark Mode Glass */
     --glass-bg: hsla(200, 100%, 19%, 0.8);
     --glass-border: hsla(200, 84%, 43%, 0.2);
     --glass-shadow: 0 8px 32px hsla(0, 0%, 0%, 0.3);
-    
+
     --sidebar-background: var(--maersk-navy);
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: var(--maersk-blue);
@@ -138,11 +155,20 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-body);
-    background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--maersk-ice)) 100%);
+    background: linear-gradient(
+      135deg,
+      hsl(var(--background)) 0%,
+      hsl(var(--maersk-ice)) 100%
+    );
     min-height: 100vh;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-heading);
     font-weight: 600;
     letter-spacing: -0.025em;
@@ -157,36 +183,36 @@
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
   }
-  
+
   .glass-card {
     @apply glass rounded-2xl p-6;
   }
-  
+
   /* Button Variants */
   .btn-hero {
     @apply bg-gradient-to-r from-maersk-navy to-maersk-blue text-white px-8 py-4 rounded-xl font-semibold tracking-wide;
     @apply hover:shadow-lg hover:shadow-maersk-blue/25 transition-all duration-300;
     @apply hover:scale-105 active:scale-95;
   }
-  
+
   .btn-glass {
     @apply glass text-maersk-navy px-6 py-3 rounded-xl font-medium;
     @apply hover:bg-white/20 transition-all duration-300;
   }
-  
+
   /* Animations */
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
-  
+
   .animate-glow {
     animation: glow 2s ease-in-out infinite alternate;
   }
-  
+
   .animate-pulse-slow {
     animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
-  
+
   /* Gradient Text */
   .gradient-text {
     background: var(--gradient-primary);
@@ -194,24 +220,24 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
+
   /* Interactive Elements */
   .quiz-option {
     @apply glass-card cursor-pointer transition-all duration-300;
     @apply hover:scale-105 hover:shadow-lg hover:shadow-maersk-blue/20;
     @apply active:scale-95;
   }
-  
+
   .quiz-option.selected {
     @apply bg-maersk-blue text-white border-maersk-blue;
     box-shadow: 0 0 20px hsla(var(--maersk-blue), 0.4);
   }
-  
+
   .quiz-option.correct {
     @apply bg-green-500 text-white border-green-500;
     animation: correctPulse 0.6s ease-out;
   }
-  
+
   .quiz-option.incorrect {
     @apply bg-red-500 text-white border-red-500;
     animation: incorrectShake 0.6s ease-out;
@@ -222,15 +248,15 @@
   .text-shadow {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
-  
+
   .bg-cosmic {
     background: var(--gradient-cosmic);
   }
-  
+
   .bg-maersk-gradient {
     background: var(--gradient-primary);
   }
-  
+
   .bg-maersk-secondary-gradient {
     background: var(--gradient-secondary);
   }
@@ -238,23 +264,55 @@
 
 /* Keyframe Animations */
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
 }
 
 @keyframes glow {
-  from { box-shadow: 0 0 5px hsla(var(--maersk-blue), 0.2); }
-  to { box-shadow: 0 0 20px hsla(var(--maersk-blue), 0.6); }
+  from {
+    box-shadow: 0 0 5px hsla(var(--maersk-blue), 0.2);
+  }
+  to {
+    box-shadow: 0 0 20px hsla(var(--maersk-blue), 0.6);
+  }
 }
 
 @keyframes correctPulse {
-  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-  70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
-  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  }
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
 }
 
 @keyframes incorrectShake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-  20%, 40%, 60%, 80% { transform: translateX(5px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-5px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(5px);
+  }
 }

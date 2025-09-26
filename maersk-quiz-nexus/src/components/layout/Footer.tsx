@@ -1,11 +1,11 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { Anchor, Github, Linkedin, Twitter } from 'lucide-react';
+import React from "react";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { Anchor, Github, Linkedin, Twitter } from "lucide-react";
 
 const Footer = () => {
   return (
-    <motion.footer 
+    <motion.footer
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
@@ -21,14 +21,16 @@ const Footer = () => {
               </div>
               <div>
                 <h3 className="font-heading text-xl font-bold gradient-text">
-                  Maersk Quiz Pro
+                  OminbaseQuiz App
                 </h3>
-                <p className="text-sm text-muted-foreground">Enterprise Learning Platform</p>
+                <p className="text-sm text-muted-foreground">
+                  Intelligent Quiz Platform
+                </p>
               </div>
             </div>
             <p className="text-muted-foreground text-sm max-w-md">
-              Empowering maritime professionals with cutting-edge quiz technology. 
-              Built for enterprise-scale learning and assessment.
+              Adaptive, real-time assessment platform with role-based control,
+              analytics, and resilient session management.
             </p>
             <div className="flex items-center space-x-4 mt-6">
               <motion.a
@@ -60,25 +62,39 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-heading font-semibold text-foreground mb-4">Platform</h4>
+            <h4 className="font-heading font-semibold text-foreground mb-4">
+              Platform
+            </h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/dashboard" className="text-muted-foreground hover:text-maersk-blue transition-colors">
+                <Link
+                  to="/dashboard"
+                  className="text-muted-foreground hover:text-maersk-blue transition-colors"
+                >
                   Quiz Dashboard
                 </Link>
               </li>
               <li>
-                <Link to="/analytics" className="text-muted-foreground hover:text-maersk-blue transition-colors">
+                <Link
+                  to="/analytics"
+                  className="text-muted-foreground hover:text-maersk-blue transition-colors"
+                >
                   Analytics
                 </Link>
               </li>
               <li>
-                <Link to="/admin" className="text-muted-foreground hover:text-maersk-blue transition-colors">
+                <Link
+                  to="/admin"
+                  className="text-muted-foreground hover:text-maersk-blue transition-colors"
+                >
                   Admin Panel
                 </Link>
               </li>
               <li>
-                <Link to="/docs" className="text-muted-foreground hover:text-maersk-blue transition-colors">
+                <Link
+                  to="/docs"
+                  className="text-muted-foreground hover:text-maersk-blue transition-colors"
+                >
                   Documentation
                 </Link>
               </li>
@@ -87,25 +103,39 @@ const Footer = () => {
 
           {/* Support */}
           <div>
-            <h4 className="font-heading font-semibold text-foreground mb-4">Support</h4>
+            <h4 className="font-heading font-semibold text-foreground mb-4">
+              Support
+            </h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/help" className="text-muted-foreground hover:text-maersk-blue transition-colors">
+                <Link
+                  to="/help"
+                  className="text-muted-foreground hover:text-maersk-blue transition-colors"
+                >
                   Help Center
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-muted-foreground hover:text-maersk-blue transition-colors">
+                <Link
+                  to="/contact"
+                  className="text-muted-foreground hover:text-maersk-blue transition-colors"
+                >
                   Contact Us
                 </Link>
               </li>
               <li>
-                <Link to="/privacy" className="text-muted-foreground hover:text-maersk-blue transition-colors">
+                <Link
+                  to="/privacy"
+                  className="text-muted-foreground hover:text-maersk-blue transition-colors"
+                >
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link to="/terms" className="text-muted-foreground hover:text-maersk-blue transition-colors">
+                <Link
+                  to="/terms"
+                  className="text-muted-foreground hover:text-maersk-blue transition-colors"
+                >
                   Terms of Service
                 </Link>
               </li>
@@ -114,9 +144,9 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-border mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
-          <p>© 2024 A.P. Moller - Maersk. All rights reserved.</p>
+          <p>© 2025 OminbaseQuiz App. All rights reserved.</p>
           <p className="mt-4 md:mt-0">
-            Built with precision for maritime excellence
+            Built for real-time learning & analytics
           </p>
         </div>
       </div>

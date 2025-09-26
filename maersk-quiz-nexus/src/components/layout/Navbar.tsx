@@ -1,25 +1,25 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
-import { useAuth } from '@/hooks/useAuth';
-import { 
-  User, 
-  LogOut, 
-  Settings, 
-  BarChart3, 
-  BookOpen, 
+import React from "react";
+import { motion } from "framer-motion";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  User,
+  LogOut,
+  Settings,
+  BarChart3,
+  BookOpen,
   Shield,
-  Anchor
-} from 'lucide-react';
+  Anchor,
+} from "lucide-react";
 
 const Navbar = () => {
   const location = useLocation();
@@ -28,13 +28,13 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     await signOut();
-    navigate('/');
+    navigate("/");
   };
 
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <motion.nav 
+    <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       className="glass-card sticky top-0 z-50 mx-4 mt-4 mb-8"
@@ -42,7 +42,7 @@ const Navbar = () => {
       <div className="flex items-center justify-between px-6 py-4">
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-3 group">
-          <motion.div 
+          <motion.div
             whileHover={{ rotate: 180 }}
             transition={{ duration: 0.3 }}
             className="p-2 bg-maersk-gradient rounded-xl"
@@ -51,9 +51,11 @@ const Navbar = () => {
           </motion.div>
           <div>
             <h1 className="font-heading text-xl font-bold gradient-text">
-              Maersk Quiz Pro
+              OminbaseQuiz App
             </h1>
-            <p className="text-xs text-muted-foreground">Enterprise Learning Platform</p>
+            <p className="text-xs text-muted-foreground">
+              Intelligent Quiz Platform
+            </p>
           </div>
         </Link>
 
@@ -61,7 +63,7 @@ const Navbar = () => {
         {user && profile && (
           <div className="hidden md:flex items-center space-x-1">
             <Button
-              variant={isActive('/dashboard') ? 'default' : 'ghost'}
+              variant={isActive("/dashboard") ? "default" : "ghost"}
               asChild
               className="rounded-xl"
             >
@@ -70,9 +72,9 @@ const Navbar = () => {
                 <span>Quizzes</span>
               </Link>
             </Button>
-            
+
             <Button
-              variant={isActive('/analytics') ? 'default' : 'ghost'}
+              variant={isActive("/analytics") ? "default" : "ghost"}
               asChild
               className="rounded-xl"
             >
@@ -81,10 +83,10 @@ const Navbar = () => {
                 <span>Analytics</span>
               </Link>
             </Button>
-            
-            {profile.role === 'admin' && (
+
+            {profile.role === "admin" && (
               <Button
-                variant={isActive('/admin') ? 'default' : 'ghost'}
+                variant={isActive("/admin") ? "default" : "ghost"}
                 asChild
                 className="rounded-xl"
               >
@@ -102,7 +104,10 @@ const Navbar = () => {
           {user && profile ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                <Button
+                  variant="ghost"
+                  className="relative h-10 w-10 rounded-full"
+                >
                   <Avatar className="h-10 w-10 ring-2 ring-maersk-blue/20">
                     <AvatarImage src={profile.avatar_url} alt={profile.name} />
                     <AvatarFallback className="bg-maersk-gradient text-white font-semibold">
@@ -111,18 +116,26 @@ const Navbar = () => {
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 glass" align="end" forceMount>
+              <DropdownMenuContent
+                className="w-56 glass"
+                align="end"
+                forceMount
+              >
                 <div className="flex flex-col space-y-1 p-2">
-                  <p className="text-sm font-medium leading-none">{profile.name}</p>
+                  <p className="text-sm font-medium leading-none">
+                    {profile.name}
+                  </p>
                   <p className="text-xs leading-none text-muted-foreground">
                     {profile.email}
                   </p>
                   <div className="flex items-center space-x-2 mt-2">
-                    <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      profile.role === 'admin' 
-                        ? 'bg-maersk-blue text-white' 
-                        : 'bg-maersk-light-blue text-maersk-navy'
-                    }`}>
+                    <div
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        profile.role === "admin"
+                          ? "bg-maersk-blue text-white"
+                          : "bg-maersk-light-blue text-maersk-navy"
+                      }`}
+                    >
                       {profile.role.toUpperCase()}
                     </div>
                   </div>
@@ -137,7 +150,7 @@ const Navbar = () => {
                   <span>Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   className="cursor-pointer text-red-600 focus:text-red-600"
                   onClick={handleLogout}
                 >
