@@ -39,6 +39,32 @@ export const useQuizData = () => {
   const [results, setResults] = useState<QuizResult[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // Helper to coerce a raw DB row into the strongly typed Quiz interface
+  const sanitizeQuizRow = (row: any): Quiz => {
+    const allowedDifficulties = ["Easy", "Medium", "Hard"] as const;
+    const difficultyCandidate = row.difficulty || "Easy";
+    const difficulty = (
+      allowedDifficulties.includes(difficultyCandidate)
+        ? difficultyCandidate
+        : "Easy"
+    ) as Quiz["difficulty"];
+
+    return {
+      id: row.id,
+      title: row.title ?? "Untitled Quiz",
+      description: row.description ?? "",
+      questions: Array.isArray(row.questions)
+        ? (row.questions as Question[])
+        : [],
+      time_limit: typeof row.time_limit === "number" ? row.time_limit : 0,
+      difficulty,
+      category: row.category ?? "General",
+      created_at: row.created_at,
+      is_published: !!row.is_published,
+      created_by: row.created_by,
+    };
+  };
+
   const fetchQuizzes = async () => {
     try {
       setLoading(true);
@@ -50,13 +76,7 @@ export const useQuizData = () => {
 
       if (error) throw error;
 
-      const formattedQuizzes = (data || []).map((quiz) => ({
-        ...quiz,
-        questions: Array.isArray(quiz.questions)
-          ? (quiz.questions as Question[])
-          : [],
-      }));
-
+      const formattedQuizzes: Quiz[] = (data || []).map(sanitizeQuizRow);
       setQuizzes(formattedQuizzes);
     } catch (error) {
       console.error("Error fetching quizzes:", error);
@@ -77,13 +97,7 @@ export const useQuizData = () => {
 
       if (error) throw error;
 
-      const formattedQuizzes = (data || []).map((quiz) => ({
-        ...quiz,
-        questions: Array.isArray(quiz.questions)
-          ? (quiz.questions as Question[])
-          : [],
-      }));
-
+      const formattedQuizzes: Quiz[] = (data || []).map(sanitizeQuizRow);
       setQuizzes(formattedQuizzes);
     } catch (error) {
       console.error("Error fetching all quizzes:", error);
@@ -219,9 +233,96 @@ export const useQuizData = () => {
     return results;
   };
 
+  // Initial fetch (published quizzes for users; admin panels typically call fetchAllQuizzes separately)
   useEffect(() => {
     fetchQuizzes();
   }, []);
+
+  // Real-time subscription for quizzes table
+  useEffect(() => {
+    // Only establish a single channel instance per hook instance
+    const channel = supabase
+      .channel("realtime-quizzes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "quizzes" },
+        (payload: any) => {
+          setQuizzes((current) => {
+            const next = [...current];
+            const newRecord: Quiz | undefined = payload.new
+              ? sanitizeQuizRow(payload.new)
+              : undefined;
+            const oldRecord: Quiz | undefined = payload.old
+              ? sanitizeQuizRow(payload.old)
+              : undefined;
+
+            const isAdmin = profile?.role === "admin";
+
+            switch (payload.eventType) {
+              case "INSERT": {
+                if (!newRecord) return next;
+                // Users: only add if published; Admins: add all
+                if (isAdmin || newRecord.is_published) {
+                  // Avoid duplicates
+                  if (!next.find((q) => q.id === newRecord.id)) {
+                    next.unshift(newRecord); // newest first
+                  }
+                }
+                return next;
+              }
+              case "UPDATE": {
+                if (!newRecord) return next;
+                const idx = next.findIndex((q) => q.id === newRecord.id);
+                const wasInList = idx !== -1;
+                if (isAdmin) {
+                  // Always reflect latest for admin
+                  if (wasInList) {
+                    next[idx] = newRecord;
+                  } else {
+                    next.unshift(newRecord);
+                  }
+                } else {
+                  // User view: maintain only published quizzes
+                  if (newRecord.is_published) {
+                    if (wasInList) {
+                      next[idx] = newRecord;
+                    } else {
+                      next.unshift(newRecord);
+                    }
+                  } else if (wasInList) {
+                    // Became unpublished; remove for users
+                    next.splice(idx, 1);
+                  }
+                }
+                return next;
+              }
+              case "DELETE": {
+                if (!oldRecord) return next;
+                const idx = next.findIndex((q) => q.id === oldRecord.id);
+                if (idx !== -1) {
+                  next.splice(idx, 1);
+                }
+                return next;
+              }
+              default:
+                return next;
+            }
+          });
+        }
+      )
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") {
+          // Optionally re-fetch to reconcile (esp. when switching roles mid-session)
+          if (profile?.role === "admin") {
+            fetchAllQuizzes();
+          }
+        }
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [profile?.role]);
 
   useEffect(() => {
     if (user) {
