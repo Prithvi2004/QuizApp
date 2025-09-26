@@ -86,7 +86,7 @@ const QuizInterface = () => {
     const percentage = (score / currentQuiz.questions.length) * 100;
 
     return (
-      <div className="min-h-screen px-4 py-12">
+      <div className="min-h-screen px-3 sm:px-4 py-10 sm:py-12">
         {showConfetti && (
           <Confetti
             width={windowSize.width}
@@ -116,7 +116,7 @@ const QuizInterface = () => {
             <p className="text-xl text-muted-foreground">{currentQuiz.title}</p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-6 mb-8">
             <Card className="glass-card text-center">
               <CardContent className="p-6">
                 <div className="text-3xl font-bold text-foreground mb-2">
@@ -204,7 +204,7 @@ const QuizInterface = () => {
             </CardContent>
           </Card>
 
-          <div className="flex justify-center space-x-4">
+          <div className="flex flex-col sm:flex-row justify-center gap-4 sm:space-x-4">
             <Button
               onClick={() => navigate("/dashboard")}
               variant="outline"
@@ -233,7 +233,7 @@ const QuizInterface = () => {
     ((currentQuestionIndex + 1) / currentQuiz.questions.length) * 100;
 
   return (
-    <div className="min-h-screen px-4 py-8">
+    <div className="min-h-screen px-3 sm:px-4 py-6 sm:py-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div
@@ -241,9 +241,9 @@ const QuizInterface = () => {
           animate={{ opacity: 1, y: 0 }}
           className="glass-card p-6 mb-8"
         >
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div>
-              <h1 className="font-heading text-2xl font-bold text-foreground">
+              <h1 className="font-heading text-xl sm:text-2xl font-bold text-foreground leading-tight">
                 {currentQuiz.title}
               </h1>
               <p className="text-muted-foreground">
@@ -280,11 +280,11 @@ const QuizInterface = () => {
           >
             <Card className="glass-card mb-8">
               <CardContent className="p-8">
-                <h2 className="font-heading text-2xl font-bold text-foreground mb-8">
+                <h2 className="font-heading text-xl sm:text-2xl font-bold text-foreground mb-6 sm:mb-8 leading-tight">
                   {currentQuestion.question}
                 </h2>
 
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {currentQuestion.options.map((option, index) => (
                     <motion.button
                       key={index}
@@ -321,7 +321,7 @@ const QuizInterface = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between"
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
         >
           <Button
             variant="outline"
@@ -337,7 +337,7 @@ const QuizInterface = () => {
             Previous
           </Button>
 
-          <div className="flex space-x-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:space-x-4">
             <Button
               variant="outline"
               onClick={handleFinishQuiz}

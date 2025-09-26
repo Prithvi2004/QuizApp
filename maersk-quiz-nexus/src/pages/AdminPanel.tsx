@@ -393,7 +393,7 @@ const AdminPanel = () => {
   }, []);
 
   return (
-    <div className="min-h-screen px-4 pb-20">
+    <div className="min-h-screen px-3 sm:px-4 pb-16 sm:pb-20">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -401,12 +401,12 @@ const AdminPanel = () => {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="font-heading text-4xl font-bold gradient-text mb-2">
+              <h1 className="font-heading text-3xl sm:text-4xl font-bold gradient-text mb-2 leading-tight">
                 Admin Dashboard
               </h1>
-              <p className="text-muted-foreground text-lg">
+              <p className="text-muted-foreground text-base sm:text-lg">
                 Manage quizzes, monitor performance, and control platform
                 settings
               </p>
@@ -422,7 +422,7 @@ const AdminPanel = () => {
                   Create Quiz
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto glass">
+              <DialogContent className="w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto glass p-4 sm:p-6">
                 <DialogHeader>
                   <DialogTitle className="font-heading text-2xl gradient-text">
                     Create New Quiz
@@ -435,7 +435,7 @@ const AdminPanel = () => {
 
                 <div className="space-y-6 py-4">
                   {/* Quiz Details */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="title">Quiz Title</Label>
                       <Input
@@ -485,7 +485,7 @@ const AdminPanel = () => {
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="difficulty">Difficulty</Label>
                       <Select
@@ -640,7 +640,7 @@ const AdminPanel = () => {
                     )}
                   </div>
 
-                  <div className="flex justify-end space-x-4 border-t pt-6">
+                  <div className="flex flex-col sm:flex-row sm:justify-end gap-4 sm:space-x-4 border-t pt-6">
                     <Button
                       variant="outline"
                       onClick={() => setIsCreateModalOpen(false)}

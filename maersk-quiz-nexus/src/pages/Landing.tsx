@@ -83,7 +83,7 @@ const Landing = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative px-4 py-20 overflow-hidden">
+      <section className="relative px-3 sm:px-4 py-16 sm:py-20 overflow-hidden">
         <div className="absolute inset-0 bg-cosmic opacity-10" />
         <div className="absolute inset-0">
           <div className="absolute top-20 left-20 w-72 h-72 bg-maersk-blue/20 rounded-full blur-3xl animate-pulse-slow" />
@@ -101,11 +101,11 @@ const Landing = () => {
               Enterprise-Grade Learning Platform
             </Badge>
 
-            <h1 className="font-heading text-5xl md:text-7xl font-bold mb-6 text-shadow">
+            <h1 className="font-heading text-4xl sm:text-5xl md:text-7xl font-bold mb-6 text-shadow leading-tight">
               <span className="gradient-text">OminbaseQuiz App</span>
             </h1>
 
-            <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto px-1">
               The future of adaptive assessment. Stunning interface meets
               enterprise functionality with real-time analytics and role-based
               management.
@@ -134,7 +134,7 @@ const Landing = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto"
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto text-xs sm:text-sm"
           >
             {/* {stats.map((stat, index) => (
               <motion.div
@@ -158,7 +158,7 @@ const Landing = () => {
       </section>
 
       {/* Features Section */}
-      <section className="px-4 py-20">
+      <section className="px-3 sm:px-4 py-16 sm:py-20">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -166,16 +166,16 @@ const Landing = () => {
             transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <h2 className="font-heading text-4xl md:text-5xl font-bold mb-6">
+            <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold mb-6 leading-tight">
               <span className="gradient-text">Powerful Features</span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto px-1">
               Built for scale, designed for delight. Every feature crafted with
               enterprise needs in mind.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {features.map((feature, index) => (
               <motion.div
                 key={feature.title}
@@ -206,20 +206,20 @@ const Landing = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="px-4 py-20">
+      <section className="px-3 sm:px-4 py-16 sm:py-20">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6 }}
-            className="glass-card text-center p-12 relative overflow-hidden"
+            className="glass-card text-center p-8 sm:p-12 relative overflow-hidden"
           >
             <div className="absolute inset-0 bg-maersk-gradient opacity-5" />
             <div className="relative">
-              <h2 className="font-heading text-4xl font-bold mb-6">
+              <h2 className="font-heading text-3xl sm:text-4xl font-bold mb-6 leading-tight">
                 Ready to Transform Your Learning?
               </h2>
-              <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+              <p className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto px-1">
                 Join teams leveraging OminbaseQuiz App to accelerate learning
                 and performance with data-driven insights.
               </p>
