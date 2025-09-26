@@ -148,7 +148,7 @@ const Analytics = () => {
   ];
 
   return (
-    <div className="min-h-screen px-4 pb-20">
+    <div className="min-h-screen px-3 sm:px-4 pb-16 sm:pb-20">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -156,16 +156,16 @@ const Analytics = () => {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="font-heading text-4xl font-bold gradient-text mb-2">
+              <h1 className="font-heading text-3xl sm:text-4xl font-bold gradient-text mb-2 leading-tight">
                 Performance Analytics
               </h1>
-              <p className="text-muted-foreground text-lg">
+              <p className="text-muted-foreground text-base sm:text-lg max-w-2xl">
                 Track your learning progress and identify improvement areas
               </p>
             </div>
-            <Button className="btn-hero">
+            <Button className="btn-hero self-start sm:self-auto w-full sm:w-auto">
               <Download className="h-4 w-4 mr-2" />
               Export Report
             </Button>
@@ -177,7 +177,7 @@ const Analytics = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+          className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 sm:gap-6 mb-8"
         >
           {stats.map((stat, index) => (
             <Card key={stat.title} className="glass-card">
@@ -203,7 +203,7 @@ const Analytics = () => {
           ))}
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-8">
           {/* Performance Trend */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -320,7 +320,7 @@ const Analytics = () => {
         </div>
 
         {/* Category Performance & Time Analysis */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Category Performance */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

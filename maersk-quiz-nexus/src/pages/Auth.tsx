@@ -128,7 +128,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center px-3 sm:px-4 py-10 sm:py-12">
       <div className="absolute inset-0">
         <div className="absolute top-20 left-20 w-72 h-72 bg-maersk-blue/10 rounded-full blur-3xl animate-pulse-slow" />
         <div className="absolute bottom-20 right-20 w-96 h-96 bg-maersk-light-blue/10 rounded-full blur-3xl animate-float" />
@@ -140,7 +140,7 @@ const Auth = () => {
         transition={{ duration: 0.6 }}
         className="w-full max-w-md relative"
       >
-        <Card className="glass-card">
+        <Card className="glass-card shadow-lg">
           <CardHeader className="text-center pb-8">
             <div className="flex justify-center mb-4">
               <motion.div
@@ -160,8 +160,8 @@ const Auth = () => {
             </CardDescription>
           </CardHeader>
 
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <CardContent className="pt-0">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <AnimatePresence mode="wait">
                 {!isLogin && (
                   <motion.div
@@ -305,7 +305,7 @@ const Auth = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-2 text-xs">
                 {demoAccounts.map((account) => (
                   <Button
                     key={account.type}

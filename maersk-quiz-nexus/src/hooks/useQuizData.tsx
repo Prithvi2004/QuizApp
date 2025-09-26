@@ -37,6 +37,8 @@ export const useQuizData = () => {
   const { user, profile } = useAuth();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [results, setResults] = useState<QuizResult[]>([]);
+  // All users' results (admin only)
+  const [adminResults, setAdminResults] = useState<QuizResult[]>([]);
   const [loading, setLoading] = useState(false);
 
   // Helper to coerce a raw DB row into the strongly typed Quiz interface
@@ -127,6 +129,26 @@ export const useQuizData = () => {
       );
     } catch (error) {
       console.error("Error fetching results:", error);
+    }
+  };
+
+  // Admin: fetch all quiz results across users
+  const fetchAllResults = async () => {
+    if (!user || profile?.role !== "admin") return;
+    try {
+      const { data, error } = await supabase
+        .from("quiz_results")
+        .select("*")
+        .order("completed_at", { ascending: false });
+      if (error) throw error;
+      setAdminResults(
+        (data || []).map((r) => ({
+          ...r,
+          answers: Array.isArray(r.answers) ? (r.answers as number[]) : [],
+        }))
+      );
+    } catch (e) {
+      console.error("Error fetching all results (admin):", e);
     }
   };
 
@@ -360,13 +382,74 @@ export const useQuizData = () => {
     }
   }, [user]);
 
+  // When admin, fetch all results (and refetch when role changes)
+  useEffect(() => {
+    if (profile?.role === "admin" && user) {
+      fetchAllResults();
+    }
+  }, [profile?.role, user]);
+
+  // Optional: realtime subscription for quiz_results (admin only)
+  useEffect(() => {
+    if (profile?.role !== "admin") return;
+    const channel = supabase
+      .channel("realtime-quiz-results")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "quiz_results" },
+        (payload: any) => {
+          setAdminResults((current) => {
+            const next = [...current];
+            switch (payload.eventType) {
+              case "INSERT":
+                if (!next.find((r) => r.id === payload.new.id)) {
+                  next.unshift({
+                    ...(payload.new as QuizResult),
+                    answers: Array.isArray(payload.new.answers)
+                      ? (payload.new.answers as number[])
+                      : [],
+                  });
+                }
+                break;
+              case "UPDATE": {
+                const idx = next.findIndex((r) => r.id === payload.new.id);
+                if (idx !== -1) {
+                  next[idx] = {
+                    ...(payload.new as QuizResult),
+                    answers: Array.isArray(payload.new.answers)
+                      ? (payload.new.answers as number[])
+                      : [],
+                  };
+                }
+                break;
+              }
+              case "DELETE": {
+                const idx = next.findIndex((r) => r.id === payload.old.id);
+                if (idx !== -1) next.splice(idx, 1);
+                break;
+              }
+              default:
+                break;
+            }
+            return next;
+          });
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [profile?.role]);
+
   return {
     quizzes,
     results,
+    adminResults,
     loading,
     fetchQuizzes,
     fetchAllQuizzes,
     fetchUserResults,
+    fetchAllResults,
     createQuiz,
     updateQuiz,
     deleteQuiz,

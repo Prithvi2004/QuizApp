@@ -83,7 +83,7 @@ const Landing = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative px-3 sm:px-4 py-16 sm:py-20 overflow-hidden">
+      <section className="relative px-3 sm:px-4 py-14 sm:py-20 overflow-hidden">
         <div className="absolute inset-0 bg-cosmic opacity-10" />
         <div className="absolute inset-0">
           <div className="absolute top-20 left-20 w-72 h-72 bg-maersk-blue/20 rounded-full blur-3xl animate-pulse-slow" />
@@ -101,7 +101,7 @@ const Landing = () => {
               Enterprise-Grade Learning Platform
             </Badge>
 
-            <h1 className="font-heading text-4xl sm:text-5xl md:text-7xl font-bold mb-6 text-shadow leading-tight">
+            <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold mb-6 text-shadow leading-tight">
               <span className="gradient-text">OminbaseQuiz App</span>
             </h1>
 
@@ -136,29 +136,29 @@ const Landing = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto text-xs sm:text-sm"
           >
-            {/* {stats.map((stat, index) => (
+            {stats.map((stat) => (
               <motion.div
                 key={stat.label}
                 whileHover={{ scale: 1.05 }}
-                className="glass-card text-center"
+                className="glass-card text-center p-4 sm:p-5"
               >
                 <div className="flex items-center justify-center mb-2 text-maersk-blue">
                   {stat.icon}
                 </div>
-                <div className="font-heading text-2xl font-bold text-foreground mb-1">
+                <div className="font-heading text-xl sm:text-2xl font-bold text-foreground mb-1">
                   {stat.number}
                 </div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-[11px] sm:text-sm text-muted-foreground font-medium tracking-wide">
                   {stat.label}
                 </div>
               </motion.div>
-            ))} */}
+            ))}
           </motion.div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="px-3 sm:px-4 py-16 sm:py-20">
+      <section className="px-3 sm:px-4 py-14 sm:py-20">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -206,7 +206,7 @@ const Landing = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="px-3 sm:px-4 py-16 sm:py-20">
+      <section className="px-3 sm:px-4 py-14 sm:py-20">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}

@@ -22,6 +22,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useQuizData, Quiz, Question } from "@/hooks/useQuizData";
+import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import AdminSetup from "@/components/AdminSetup";
 import {
@@ -48,8 +49,11 @@ const AdminPanel = () => {
     updateQuiz,
     deleteQuiz,
     results,
+    adminResults,
+    fetchAllResults,
     fetchAllQuizzes,
   } = useQuizData();
+  const { profile } = useAuth();
   const { toast } = useToast();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
@@ -357,8 +361,13 @@ const AdminPanel = () => {
     return `${minutes}m`;
   };
 
+  // Use all results (admin) or just user results appropriately
+  const allResults = profile?.role === "admin" ? adminResults : results;
+
   const getQuizStats = (quizId: string) => {
-    const quizResults = results.filter((result) => result.quiz_id === quizId);
+    const quizResults = allResults.filter(
+      (result) => result.quiz_id === quizId
+    );
     const averageScore =
       quizResults.length > 0
         ? quizResults.reduce(
@@ -376,20 +385,21 @@ const AdminPanel = () => {
 
   const totalQuizzes = quizzes.length;
   const publishedQuizzes = quizzes.filter((q) => q.is_published).length;
-  const totalAttempts = results.length;
+  const totalAttempts = allResults.length;
   const averageScore =
-    results.length > 0
+    allResults.length > 0
       ? Math.round(
-          results.reduce(
+          allResults.reduce(
             (acc, result) =>
               acc + (result.score / result.total_questions) * 100,
             0
-          ) / results.length
+          ) / allResults.length
         )
       : 0;
 
   useEffect(() => {
     fetchAllQuizzes();
+    fetchAllResults();
   }, []);
 
   return (
@@ -664,7 +674,7 @@ const AdminPanel = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+          className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 sm:gap-6 mb-8"
         >
           <Card className="glass-card">
             <CardContent className="p-6">
@@ -766,15 +776,23 @@ const AdminPanel = () => {
               <div className="space-y-4">
                 {quizzes.map((quiz) => {
                   const stats = getQuizStats(quiz.id);
+                  const quizAttempts = (adminResults || []).filter(
+                    (r) => r.quiz_id === quiz.id
+                  );
+                  const firstThree = quizAttempts.slice(0, 3);
+                  const [openIds, setOpenIds] = [
+                    undefined as any,
+                    undefined as any,
+                  ];
 
                   return (
                     <div
                       key={quiz.id}
-                      className="p-6 bg-background/50 rounded-xl"
+                      className="p-4 sm:p-6 bg-background/50 rounded-xl space-y-3"
                     >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-3 mb-2">
+                      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
                             <h3 className="font-heading text-lg font-bold text-foreground">
                               {quiz.title}
                             </h3>
@@ -802,10 +820,10 @@ const AdminPanel = () => {
                             {quiz.description}
                           </p>
 
-                          <div className="flex items-center space-x-6 text-sm text-muted-foreground">
+                          <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
                             <div className="flex items-center space-x-1">
                               <BookOpen className="h-4 w-4" />
-                              <span>{quiz.questions.length} questions</span>
+                              <span>{quiz.questions.length} Qs</span>
                             </div>
                             <div className="flex items-center space-x-1">
                               <Clock className="h-4 w-4" />
@@ -822,39 +840,118 @@ const AdminPanel = () => {
                           </div>
                         </div>
 
-                        <div className="flex items-center space-x-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handlePublishToggle(quiz.id)}
-                            className="btn-glass"
-                          >
-                            {quiz.is_published ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </Button>
-
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setEditingQuiz(quiz)}
-                            className="btn-glass"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDeleteQuiz(quiz.id)}
-                            className="btn-glass text-red-600 hover:text-red-700"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                        <div className="flex md:flex-col lg:flex-row items-start md:items-center gap-2 md:gap-3 shrink-0">
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handlePublishToggle(quiz.id)}
+                              className="btn-glass"
+                            >
+                              {quiz.is_published ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingQuiz(quiz)}
+                              className="btn-glass"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteQuiz(quiz.id)}
+                              className="btn-glass text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
+                      {quizAttempts.length > 0 && (
+                        <div className="mt-2">
+                          <div className="text-xs font-medium text-muted-foreground mb-2">
+                            Recent Attempts ({quizAttempts.length} total)
+                          </div>
+                          <div className="space-y-2">
+                            {firstThree.map((attempt) => {
+                              const scorePct = Math.round(
+                                (attempt.score / attempt.total_questions) * 100
+                              );
+                              return (
+                                <div
+                                  key={attempt.id}
+                                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-lg border border-border/60 p-3 bg-background/40"
+                                >
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-foreground truncate">
+                                      {attempt.user_id}
+                                    </p>
+                                    <p className="text-[11px] text-muted-foreground">
+                                      {new Date(
+                                        attempt.completed_at
+                                      ).toLocaleString()}
+                                    </p>
+                                  </div>
+                                  <div className="flex items-center gap-4 mt-2 sm:mt-0">
+                                    <span className="text-sm font-semibold text-maersk-blue">
+                                      {scorePct}%
+                                    </span>
+                                    <span className="text-xs text-muted-foreground">
+                                      {(attempt.time_spent / 60) | 0}m
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                          {quizAttempts.length > 3 && (
+                            <details className="mt-3 group">
+                              <summary className="cursor-pointer text-xs text-maersk-blue hover:underline list-none">
+                                View all {quizAttempts.length} attempts
+                              </summary>
+                              <div className="mt-2 max-h-64 overflow-y-auto pr-1 space-y-2">
+                                {quizAttempts.slice(3).map((attempt) => {
+                                  const scorePct = Math.round(
+                                    (attempt.score / attempt.total_questions) *
+                                      100
+                                  );
+                                  return (
+                                    <div
+                                      key={attempt.id}
+                                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-lg border border-border/60 p-3 bg-background/30"
+                                    >
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-medium truncate">
+                                          {attempt.user_id}
+                                        </p>
+                                        <p className="text-[11px] text-muted-foreground">
+                                          {new Date(
+                                            attempt.completed_at
+                                          ).toLocaleString()}
+                                        </p>
+                                      </div>
+                                      <div className="flex items-center gap-4 mt-2 sm:mt-0">
+                                        <span className="text-sm font-semibold text-maersk-blue">
+                                          {scorePct}%
+                                        </span>
+                                        <span className="text-xs text-muted-foreground">
+                                          {(attempt.time_spent / 60) | 0}m
+                                        </span>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </details>
+                          )}
+                        </div>
+                      )}
                     </div>
                   );
                 })}

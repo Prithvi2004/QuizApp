@@ -279,8 +279,8 @@ const QuizInterface = () => {
             transition={{ duration: 0.3 }}
           >
             <Card className="glass-card mb-8">
-              <CardContent className="p-8">
-                <h2 className="font-heading text-xl sm:text-2xl font-bold text-foreground mb-6 sm:mb-8 leading-tight">
+              <CardContent className="p-5 sm:p-8">
+                <h2 className="font-heading text-lg sm:text-2xl font-bold text-foreground mb-5 sm:mb-8 leading-tight">
                   {currentQuestion.question}
                 </h2>
 
@@ -291,7 +291,7 @@ const QuizInterface = () => {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => handleAnswerSelect(index)}
-                      className={`w-full p-6 text-left rounded-xl border-2 transition-all duration-300 ${
+                      className={`w-full px-4 py-4 sm:p-6 text-left rounded-xl border-2 transition-all duration-300 ${
                         selectedAnswer === index
                           ? "border-maersk-blue bg-maersk-blue/10 text-maersk-blue"
                           : "border-border bg-background/50 hover:border-maersk-light-blue hover:bg-maersk-light-blue/10"
@@ -307,7 +307,9 @@ const QuizInterface = () => {
                         >
                           {String.fromCharCode(65 + index)}
                         </div>
-                        <span className="text-lg font-medium">{option}</span>
+                        <span className="text-base sm:text-lg font-medium leading-snug break-words">
+                          {option}
+                        </span>
                       </div>
                     </motion.button>
                   ))}

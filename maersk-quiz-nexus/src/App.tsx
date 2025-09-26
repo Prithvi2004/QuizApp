@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import QuizInterface from "./pages/QuizInterface";
 import Analytics from "./pages/Analytics";
 import AdminPanel from "./pages/AdminPanel";
+import Results from "./pages/Results";
 import NotFound from "./pages/NotFound";
 import { AuthProvider, useAuth } from "./hooks/useAuth";
 
@@ -18,7 +19,7 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   const { user, profile, loading } = useAuth();
-  
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -29,22 +30,25 @@ const AppContent = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/auth" element={<Auth />} />
-        
+
         {/* Protected Routes */}
         {user && profile ? (
           <>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/quiz/:quizId" element={<QuizInterface />} />
             <Route path="/analytics" element={<Analytics />} />
-            {profile.role === 'admin' && (
-              <Route path="/admin" element={<AdminPanel />} />
+            {profile.role === "admin" && (
+              <>
+                <Route path="/admin" element={<AdminPanel />} />
+                <Route path="/results" element={<Results />} />
+              </>
             )}
           </>
         ) : (
@@ -53,9 +57,10 @@ const AppContent = () => {
             <Route path="/quiz/*" element={<Auth />} />
             <Route path="/analytics" element={<Auth />} />
             <Route path="/admin" element={<Auth />} />
+            <Route path="/results" element={<Auth />} />
           </>
         )}
-        
+
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -17,6 +17,7 @@ import {
   Settings,
   BarChart3,
   BookOpen,
+  ListChecks,
   Shield,
   Anchor,
   Menu,
@@ -94,6 +95,18 @@ const Navbar = () => {
                 <Link to="/admin" className="flex items-center space-x-2">
                   <Shield className="h-4 w-4" />
                   <span>Admin</span>
+                </Link>
+              </Button>
+            )}
+            {profile.role === "admin" && (
+              <Button
+                variant={isActive("/results") ? "default" : "ghost"}
+                asChild
+                className="rounded-xl"
+              >
+                <Link to="/results" className="flex items-center space-x-2">
+                  <ListChecks className="h-4 w-4" />
+                  <span>Results</span>
                 </Link>
               </Button>
             )}
@@ -229,6 +242,19 @@ const Navbar = () => {
                 <Link to="/admin" className="flex items-center space-x-2">
                   <Shield className="h-4 w-4" />
                   <span>Admin</span>
+                </Link>
+              </Button>
+            )}
+            {profile.role === "admin" && (
+              <Button
+                variant={isActive("/results") ? "default" : "outline"}
+                asChild
+                className="justify-start rounded-lg"
+                onClick={() => setMobileOpen(false)}
+              >
+                <Link to="/results" className="flex items-center space-x-2">
+                  <ListChecks className="h-4 w-4" />
+                  <span>Results</span>
                 </Link>
               </Button>
             )}
