@@ -148,11 +148,16 @@ export const useQuizData = () => {
 
       if (error) throw error;
 
-      // Refresh quizzes if it's published
-      if (data.is_published) {
-        await fetchQuizzes();
-      }
-
+      // Optimistically add to list for admins (always) or for users if published
+      const newQuiz = sanitizeQuizRow(data);
+      setQuizzes((prev) => {
+        const exists = prev.some((q) => q.id === newQuiz.id);
+        if (exists) return prev;
+        if (profile?.role === "admin" || newQuiz.is_published) {
+          return [newQuiz, ...prev];
+        }
+        return prev; // draft quiz not visible to normal users
+      });
       return data;
     } catch (error) {
       console.error("Error creating quiz:", error);
@@ -170,11 +175,38 @@ export const useQuizData = () => {
         .single();
 
       if (error) throw error;
-
-      // Refresh quizzes
-      await fetchQuizzes();
-
-      return data;
+      if (!data) return null;
+      const updated = sanitizeQuizRow(data);
+      setQuizzes((prev) => {
+        const idx = prev.findIndex((q) => q.id === updated.id);
+        const isAdmin = profile?.role === "admin";
+        const isVisibleToUser = updated.is_published;
+        // Admin: always keep it in list
+        if (isAdmin) {
+          if (idx !== -1) {
+            const clone = [...prev];
+            clone[idx] = updated;
+            return clone;
+          }
+          return [updated, ...prev];
+        }
+        // Non-admin users: only keep if published
+        if (isVisibleToUser) {
+          if (idx !== -1) {
+            const clone = [...prev];
+            clone[idx] = updated;
+            return clone;
+          }
+          return [updated, ...prev];
+        } else if (idx !== -1) {
+          // Became unpublished -> remove for users
+          const clone = [...prev];
+          clone.splice(idx, 1);
+          return clone;
+        }
+        return prev;
+      });
+      return updated;
     } catch (error) {
       console.error("Error updating quiz:", error);
       throw error;
@@ -189,9 +221,7 @@ export const useQuizData = () => {
         .eq("id", quizId);
 
       if (error) throw error;
-
-      // Refresh quizzes
-      await fetchQuizzes();
+      setQuizzes((prev) => prev.filter((q) => q.id !== quizId));
     } catch (error) {
       console.error("Error deleting quiz:", error);
       throw error;

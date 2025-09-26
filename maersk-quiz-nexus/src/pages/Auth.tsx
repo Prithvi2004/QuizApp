@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -43,9 +43,10 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [role, setRole] = useState<"user" | "admin">("user");
-  const { signIn, signUp, loading } = useAuth();
+  const { signIn, signUp, loading, user, profile } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,10 +88,6 @@ const Auth = () => {
           ? "Successfully signed in!"
           : "Account created! Please check your email to verify.",
       });
-
-      if (isLogin) {
-        navigate("/dashboard");
-      }
     } catch (error) {
       toast({
         title: "Authentication Failed",
@@ -99,6 +96,16 @@ const Auth = () => {
       });
     }
   };
+
+  // Role-based post-auth redirect once profile is available
+  useEffect(() => {
+    if (user && profile) {
+      const target = profile.role === "admin" ? "/admin" : "/dashboard";
+      if (location.pathname !== target) {
+        navigate(target, { replace: true });
+      }
+    }
+  }, [user, profile, location.pathname, navigate]);
 
   const demoAccounts = [
     {
