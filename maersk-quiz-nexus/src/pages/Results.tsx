@@ -160,20 +160,112 @@ const Results: React.FC = () => {
     profilesMap,
   ]);
 
+  // Global analytics (admins only)
   const stats = useMemo(() => {
-    if (adminResults.length === 0) return { attempts: 0, avg: 0, avgTime: 0 };
+    if (adminResults.length === 0)
+      return {
+        attempts: 0,
+        avg: 0,
+        avgTime: 0,
+        uniqueUsers: 0,
+        passRate: 0,
+        mostAttemptedQuizId: "",
+        mostAttemptedQuizTitle: "",
+      };
     const attempts = adminResults.length;
+    const scorePercents = adminResults.map(
+      (r) => (r.score / r.total_questions) * 100
+    );
     const avg = Math.round(
-      adminResults.reduce(
-        (a, r) => a + (r.score / r.total_questions) * 100,
-        0
-      ) / attempts
+      scorePercents.reduce((a, n) => a + n, 0) / scorePercents.length
     );
     const avgTime = Math.round(
       adminResults.reduce((a, r) => a + r.time_spent, 0) / attempts
     );
-    return { attempts, avg, avgTime };
-  }, [adminResults]);
+    const passThreshold = 70; // unify pass condition
+    const passCount = scorePercents.filter((p) => p >= passThreshold).length;
+    const passRate = attempts ? Math.round((passCount / attempts) * 100) : 0;
+    const uniqueUsers = new Set(adminResults.map((r) => r.user_id)).size;
+    // Most attempted quiz
+    const quizAttemptCounts: Record<string, number> = {};
+    adminResults.forEach((r) => {
+      quizAttemptCounts[r.quiz_id] = (quizAttemptCounts[r.quiz_id] || 0) + 1;
+    });
+    let mostAttemptedQuizId = "";
+    let mostAttemptedQuizTitle = "";
+    let maxAttempts = 0;
+    Object.entries(quizAttemptCounts).forEach(([qid, count]) => {
+      if (count > maxAttempts) {
+        maxAttempts = count;
+        mostAttemptedQuizId = qid;
+        mostAttemptedQuizTitle = quizMap[qid] || qid;
+      }
+    });
+    return {
+      attempts,
+      avg,
+      avgTime,
+      uniqueUsers,
+      passRate,
+      mostAttemptedQuizId,
+      mostAttemptedQuizTitle,
+    };
+  }, [adminResults, quizMap]);
+
+  // Aggregated per-user metrics for by-user view and potential export / display
+  const userAggregates = useMemo(() => {
+    const agg: Array<{
+      user_id: string;
+      name?: string;
+      email?: string;
+      role?: string;
+      attempts: number;
+      averagePercent: number;
+      bestPercent: number;
+      lastCompleted: string;
+      totalTime: number;
+      passRate: number; // percent of attempts passing threshold
+      passedAttempts: number;
+    }> = [];
+    if (adminResults.length === 0) return agg;
+    const passThreshold = 70;
+    const grouped: Record<string, typeof adminResults> = {};
+    adminResults.forEach((r) => {
+      (grouped[r.user_id] ||= []).push(r);
+    });
+    Object.entries(grouped).forEach(([uid, list]) => {
+      const percents = list.map((r) => (r.score / r.total_questions) * 100);
+      const attempts = list.length;
+      const averagePercent = Math.round(
+        percents.reduce((a, n) => a + n, 0) / attempts
+      );
+      const bestPercent = Math.round(Math.max(...percents));
+      const passedAttempts = percents.filter((p) => p >= passThreshold).length;
+      const passRate = Math.round((passedAttempts / attempts) * 100);
+      const lastCompleted = list
+        .map((r) => r.completed_at)
+        .sort()
+        .reverse()[0];
+      const totalTime = list.reduce((a, r) => a + r.time_spent, 0);
+      const prof = profilesMap[uid];
+      agg.push({
+        user_id: uid,
+        name: prof?.name,
+        email: prof?.email,
+        role: prof?.role,
+        attempts,
+        averagePercent,
+        bestPercent,
+        lastCompleted,
+        totalTime,
+        passRate,
+        passedAttempts,
+      });
+    });
+    // sort by best performance then attempts
+    agg.sort((a, b) => b.bestPercent - a.bestPercent || b.attempts - a.attempts);
+    return agg;
+  }, [adminResults, profilesMap]);
 
   const exportCSV = () => {
     const header = [
@@ -248,7 +340,7 @@ const Results: React.FC = () => {
         </div>
 
         {/* Summary Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 xl:grid-cols-6 gap-5 mb-8">
           <Card className="glass-card">
             <CardContent className="p-5">
               <p className="text-sm font-medium text-muted-foreground">
@@ -272,6 +364,32 @@ const Results: React.FC = () => {
               </p>
               <p className="text-2xl font-bold mt-1">
                 {formatDuration(stats.avgTime)}
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="glass-card">
+            <CardContent className="p-5">
+              <p className="text-sm font-medium text-muted-foreground">
+                Unique Users
+              </p>
+              <p className="text-2xl font-bold mt-1">{stats.uniqueUsers}</p>
+            </CardContent>
+          </Card>
+          <Card className="glass-card">
+            <CardContent className="p-5">
+              <p className="text-sm font-medium text-muted-foreground">
+                Pass Rate
+              </p>
+              <p className="text-2xl font-bold mt-1">{stats.passRate}%</p>
+            </CardContent>
+          </Card>
+          <Card className="glass-card">
+            <CardContent className="p-5">
+              <p className="text-sm font-medium text-muted-foreground">
+                Most Attempted
+              </p>
+              <p className="text-sm font-semibold mt-1 truncate" title={stats.mostAttemptedQuizTitle}>
+                {stats.mostAttemptedQuizTitle || "—"}
               </p>
             </CardContent>
           </Card>
@@ -337,6 +455,7 @@ const Results: React.FC = () => {
             <TabsTrigger value="table">Table View</TabsTrigger>
             <TabsTrigger value="by-quiz">By Quiz</TabsTrigger>
             <TabsTrigger value="by-user">By User</TabsTrigger>
+            <TabsTrigger value="users-table">Users Table</TabsTrigger>
           </TabsList>
           <TabsContent value="table" className="mt-4">
             <Card className="glass-card">
@@ -664,61 +783,147 @@ const Results: React.FC = () => {
             )}
           </TabsContent>
           <TabsContent value="by-user" className="mt-4 space-y-4">
-            {(() => {
-              const group: Record<string, typeof filtered> = {};
-              filtered.forEach((r) => {
-                (group[r.user_id] ||= []).push(r);
-              });
-              const entries = Object.entries(group);
-              if (entries.length === 0)
-                return (
-                  <p className="text-sm text-muted-foreground">
-                    No user data for current filters.
-                  </p>
-                );
-              return entries.map(([uid, list]) => {
-                const avg = Math.round(
-                  list.reduce(
-                    (a, r) => a + (r.score / r.total_questions) * 100,
-                    0
-                  ) / list.length
-                );
-                return (
-                  <Card key={uid} className="glass-card">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base flex items-center justify-between">
-                        <span className="font-mono">{uid.slice(0, 16)}…</span>
-                        <span className="text-xs font-normal text-muted-foreground">
-                          {list.length} attempts • {avg}% avg
-                        </span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="flex flex-wrap gap-2">
-                        {list.slice(0, 60).map((r) => {
-                          const pct = Math.round(
-                            (r.score / r.total_questions) * 100
-                          );
-                          const cls =
-                            pct >= 85
-                              ? "bg-green-500/20 text-green-700"
-                              : pct >= 70
-                              ? "bg-blue-500/20 text-blue-700"
-                              : pct >= 50
-                              ? "bg-yellow-500/20 text-yellow-700"
-                              : "bg-red-500/20 text-red-700";
-                          return (
-                            <Badge key={r.id} className={`text-[10px] ${cls}`}>
-                              {pct}%
-                            </Badge>
-                          );
-                        })}
+            {userAggregates.length === 0 && (
+              <p className="text-sm text-muted-foreground">
+                No user data for current filters.
+              </p>
+            )}
+            {userAggregates.map((u) => {
+              const list = filtered.filter((r) => r.user_id === u.user_id);
+              if (list.length === 0) return null; // filtered out by filters
+              return (
+                <Card key={u.user_id} className="glass-card">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs">{u.user_id.slice(0, 16)}…</span>
+                        {u.role && (
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full border ${
+                            u.role === "admin"
+                              ? "bg-maersk-blue/20 text-maersk-blue border-maersk-blue/40"
+                              : "bg-maersk-light-blue/30 text-maersk-navy border-maersk-light-blue/40"
+                          }`}>{u.role}</span>
+                        )}
                       </div>
-                    </CardContent>
-                  </Card>
-                );
-              });
-            })()}
+                      <span className="text-xs font-normal text-muted-foreground">
+                        {u.attempts} attempts • {u.averagePercent}% avg • Best {u.bestPercent}% • Pass {u.passRate}%
+                      </span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="flex flex-wrap gap-2">
+                      {list.slice(0, 80).map((r) => {
+                        const pct = Math.round(
+                          (r.score / r.total_questions) * 100
+                        );
+                        const cls =
+                          pct >= 85
+                            ? "bg-green-500/20 text-green-700"
+                            : pct >= 70
+                            ? "bg-blue-500/20 text-blue-700"
+                            : pct >= 50
+                            ? "bg-yellow-500/20 text-yellow-700"
+                            : "bg-red-500/20 text-red-700";
+                        return (
+                          <Badge key={r.id} className={`text-[10px] ${cls}`}>
+                            {pct}%
+                          </Badge>
+                        );
+                      })}
+                      {list.length > 80 && (
+                        <span className="text-[10px] text-muted-foreground ml-1">
+                          +{list.length - 80} more
+                        </span>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </TabsContent>
+          <TabsContent value="users-table" className="mt-4">
+            <Card className="glass-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Users Overview</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0 overflow-x-auto">
+                <table className="min-w-full text-xs">
+                  <thead>
+                    <tr className="text-left text-[10px] uppercase tracking-wide text-muted-foreground border-b">
+                      <th className="py-2 px-3">User</th>
+                      <th className="py-2 px-3">Email</th>
+                      <th className="py-2 px-3">Role</th>
+                      <th className="py-2 px-3">Attempts</th>
+                      <th className="py-2 px-3">Avg %</th>
+                      <th className="py-2 px-3">Best %</th>
+                      <th className="py-2 px-3">Pass %</th>
+                      <th className="py-2 px-3">Total Time</th>
+                      <th className="py-2 px-3">Last Attempt</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {userAggregates
+                      .filter((u) =>
+                        filtered.some((r) => r.user_id === u.user_id)
+                      )
+                      .map((u) => (
+                        <tr
+                          key={u.user_id}
+                          className="border-b last:border-b-0 hover:bg-background/60"
+                        >
+                          <td className="py-1.5 px-3 max-w-[160px]">
+                            <div className="flex flex-col">
+                              <span className="truncate font-medium" title={u.name || u.user_id}>
+                                {u.name || u.user_id.slice(0, 12) + "…"}
+                              </span>
+                              <span className="text-[9px] text-muted-foreground font-mono truncate">
+                                {u.user_id}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="py-1.5 px-3 whitespace-nowrap max-w-[180px] truncate" title={u.email}>
+                            {u.email || "—"}
+                          </td>
+                          <td className="py-1.5 px-3">
+                            {u.role ? (
+                              <span className={`text-[9px] px-1.5 py-0.5 rounded-full border ${
+                                u.role === "admin"
+                                  ? "bg-maersk-blue/20 text-maersk-blue border-maersk-blue/40"
+                                  : "bg-maersk-light-blue/30 text-maersk-navy border-maersk-light-blue/40"
+                              }`}>{u.role}</span>
+                            ) : (
+                              <span className="text-[10px] text-muted-foreground">—</span>
+                            )}
+                          </td>
+                          <td className="py-1.5 px-3 font-medium">{u.attempts}</td>
+                          <td className="py-1.5 px-3">{u.averagePercent}%</td>
+                          <td className="py-1.5 px-3">{u.bestPercent}%</td>
+                          <td className="py-1.5 px-3">{u.passRate}%</td>
+                          <td className="py-1.5 px-3">{formatDuration(u.totalTime)}</td>
+                          <td className="py-1.5 px-3 whitespace-nowrap">
+                            {new Date(u.lastCompleted).toLocaleDateString()} {" "}
+                            <span className="text-[9px] text-muted-foreground">
+                              {new Date(u.lastCompleted).toLocaleTimeString()}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    {userAggregates.filter((u) =>
+                      filtered.some((r) => r.user_id === u.user_id)
+                    ).length === 0 && (
+                      <tr>
+                        <td
+                          colSpan={9}
+                          className="py-6 text-center text-muted-foreground"
+                        >
+                          No users match current filters.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
