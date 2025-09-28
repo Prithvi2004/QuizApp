@@ -57,28 +57,28 @@ const Landing = () => {
     },
   ];
 
-  const stats = [
-    {
-      number: "10,000+",
-      label: "Active Users",
-      icon: <Users className="h-5 w-5" />,
-    },
-    {
-      number: "500+",
-      label: "Quiz Categories",
-      icon: <Globe className="h-5 w-5" />,
-    },
-    {
-      number: "98%",
-      label: "Satisfaction Rate",
-      icon: <Star className="h-5 w-5" />,
-    },
-    {
-      number: "24/7",
-      label: "Support Available",
-      icon: <Shield className="h-5 w-5" />,
-    },
-  ];
+  // const stats = [
+  //   {
+  //     number: "10,000+",
+  //     label: "Active Users",
+  //     icon: <Users className="h-5 w-5" />,
+  //   },
+  //   {
+  //     number: "500+",
+  //     label: "Quiz Categories",
+  //     icon: <Globe className="h-5 w-5" />,
+  //   },
+  //   {
+  //     number: "98%",
+  //     label: "Satisfaction Rate",
+  //     icon: <Star className="h-5 w-5" />,
+  //   },
+  //   {
+  //     number: "24/7",
+  //     label: "Support Available",
+  //     icon: <Shield className="h-5 w-5" />,
+  //   },
+  // ];
 
   return (
     <div className="min-h-screen">
@@ -136,7 +136,7 @@ const Landing = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto text-xs sm:text-sm"
           >
-            {stats.map((stat) => (
+            {/* {stats.map((stat) => (
               <motion.div
                 key={stat.label}
                 whileHover={{ scale: 1.05 }}
@@ -152,7 +152,7 @@ const Landing = () => {
                   {stat.label}
                 </div>
               </motion.div>
-            ))}
+            ))} */}
           </motion.div>
         </div>
       </section>
