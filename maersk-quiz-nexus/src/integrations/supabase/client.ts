@@ -21,9 +21,16 @@ import type { Database } from "./types";
  *    localStorage and remove the dynamic storageKey logic.
  */
 
-const SUPABASE_URL = "https://mgozxfzqafduesaovyjo.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1nb3p4ZnpxYWZkdWVzYW92eWpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3ODI1NTYsImV4cCI6MjA3NDM1ODU1Nn0.USmAJJCKzjzAC4AgwfKg2DYdxzeqJXEx0mibRi4EebQ"; // public anon key (safe client-side)
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY =
+  import.meta.env.VITE_SUPABASE_ANON_KEY ||
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  throw new Error(
+    "Supabase environment variables are missing. Check your .env configuration."
+  );
+}
 
 // Generate or retrieve a stable per-tab id (persists across reloads, not across new tab instances)
 function getTabId(): string {
@@ -50,7 +57,7 @@ const storage =
 
 export const supabase = createClient<Database>(
   SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY,
+  SUPABASE_ANON_KEY,
   {
     auth: {
       storage,
